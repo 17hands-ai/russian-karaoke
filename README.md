@@ -1,14 +1,20 @@
-# russian-karaoke
+# Russian Karaoke — guest app
 
-Спой-ка: a mobile karaoke songbook for guests, by [17hands.ai](https://17hands.ai).
+The customer-facing app for Russian Karaoke nights, brought to you by [17hands.ai](https://17hands.ai). Live at [russiankaraoke.app](https://russiankaraoke.app).
 
-Guests search the catalog by song or singer (Russian, Ukrainian or Latin letters), keep a list for tonight, save favorites, and track what they have sung. No account: each guest's name and lists stay in their own browser.
+This repo is the app only. It is what guests open on their phones at an event. The landing page for russiankaraoke.com lives in a separate repo.
+
+Guests search the catalog by song or singer (Russian, Ukrainian or Latin letters), keep a list for tonight, save favorites, and track what they have sung. The interface is in English, Russian and Ukrainian. No account: each guest's name and lists stay in their own browser, and they can add the app to their home screen.
 
 ## Files
 
 - `index.html` — the whole app (no build step)
 - `songs.json` — the catalog: one artist per line, `[artist, [[title, №, № with backing vocals], …]]`; `0` means that version does not exist. Guests see the backing-vocals № first, because that is the version the host plays by default. Russian and Ukrainian songs only for now
 - `tools/build.py` — rebuilds `songs.json` from the Excel export (drops the trailing `+` some titles carry and merges plain and backing-vocals rows into one song)
+
+## Address
+
+Keep the app on `www.russiankaraoke.app`. Saved lists and home-screen icons are tied to that exact address, so moving it would make guests' lists look empty. The storage key `spoyka.v1` in `index.html` is an internal leftover from a working name; renaming it would also wipe saved lists.
 
 ## Deploy
 
