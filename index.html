@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Russian Karaoke Songbook</title>
-<link rel="icon" href="logo-mark.webp">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#170f10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Karaoke">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
@@ -129,6 +136,10 @@ h1{font-family:var(--display);font-weight:700;font-size:19px;margin:6px 0 0;text
 .stat{background:var(--plum);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
 .stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
 .stat span{font-size:12px;color:var(--muted)}
+.inst{display:flex;flex-direction:column;gap:8px}
+.inst h2{font-family:var(--display);font-size:15px;margin:0}
+.inst p{margin:0;font-size:14px;color:var(--muted)}
+.inst p.fine{font-size:12px}
 .credit{text-align:center;font-size:13px;color:var(--muted);padding:8px 0}
 .credit a{color:var(--gold);font-weight:600;text-decoration:none}
 .fine{font-size:12px;color:var(--muted);margin:0}
@@ -295,6 +306,13 @@ nav .badge{position:absolute;top:2px;left:50%;margin-left:8px;min-width:18px;hei
         <button class="chip" data-ui="ru" aria-pressed="false">Русский</button>
         <button class="chip" data-ui="uk" aria-pressed="false">Українська</button>
       </div>
+      <div class="card inst" id="inst">
+        <h2 data-i18n="instT">Keep it on your home screen</h2>
+        <p id="inst-ios" data-i18n="instIos"></p>
+        <p id="inst-and" data-i18n="instAnd"></p>
+        <p class="fine" data-i18n="instNote"></p>
+        <button class="btn wide" id="inst-btn" hidden data-i18n="instBtn">Install</button>
+      </div>
       <button class="btn ghost wide" id="how" data-i18n="how">How it works</button>
       <p class="credit"><span data-i18n="credit">Made for karaoke nights by</span> <a href="https://17hands.ai">17hands.ai</a></p>
     </section>
@@ -376,6 +394,9 @@ let view={lang:"all",limit:40};
 /* ---------- TEXT ---------- */
 const T={
 en:{by:"brought to you by",welT:"Welcome to Russian Karaoke",welSub:"What are we singing tonight?",legFav:"save for later",legAdd:"sing tonight",
+ instT:"Keep it on your home screen",instIos:"iPhone: open this page in Safari, tap the Share button (the square with an arrow), then “Add to Home Screen”.",
+ instAnd:"Android: in Chrome, tap the ⋮ menu, then “Add to Home screen” or “Install app”.",
+ instNote:"Do this before you start saving songs, so your lists live in the app.",instBtn:"Install",
  how:"How it works",skip:"Skip",next:"Next",go:"Start singing",
  tour:[["Language · Язык · Мова","Choose the language of the app. You can change it any time at the top of the Songs tab."],
   ["Find your song","Search by song title or singer. Type in Russian, Ukrainian or Latin letters. The № is the song's number in the host's library."],
@@ -400,6 +421,9 @@ en:{by:"brought to you by",welT:"Welcome to Russian Karaoke",welSub:"What are we
  loading:"Loading the catalog…",loadErr:"The catalog didn't load. Check your connection and reload the page.",cLat:"Latin",bk:"backing",bkAlso:n=>"With backing vocals: № "+n,
  aFav:"Favorite",aAdd:"Add to tonight",aDone:"I sang it",aUp:"Move up",aDown:"Move down",aRem:"Remove",hi:n=>"Welcome, "+n+"!"},
 ru:{by:"для вас от",welT:"Добро пожаловать в Russian Karaoke",welSub:"Что поём сегодня?",legFav:"сохранить на потом",legAdd:"спеть сегодня",
+ instT:"Добавь на экран «Домой»",instIos:"iPhone: открой эту страницу в Safari, нажми «Поделиться» (квадрат со стрелкой), затем «На экран „Домой“».",
+ instAnd:"Android: в Chrome нажми меню ⋮, затем «Добавить на главный экран» или «Установить приложение».",
+ instNote:"Сделай это до того, как начнёшь сохранять песни, чтобы списки жили в приложении.",instBtn:"Установить",
  how:"Как это работает",skip:"Пропустить",next:"Дальше",go:"Начать петь",
  tour:[["Language · Язык · Мова","Выбери язык приложения. Его можно поменять в любой момент вверху вкладки «Песни»."],
   ["Найди свою песню","Ищи по названию или исполнителю. Пиши по-русски, по-украински или латиницей. № — это номер песни в библиотеке ведущего."],
@@ -425,6 +449,9 @@ ru:{by:"для вас от",welT:"Добро пожаловать в Russian Kar
  aFav:"В любимые",aAdd:"Добавить на сегодня",aDone:"Спето",aUp:"Выше",aDown:"Ниже",aRem:"Убрать",hi:n=>"Привет, "+n+"!"}
 ,
 uk:{by:"для вас від",welT:"Ласкаво просимо до Russian Karaoke",welSub:"Що співаємо сьогодні?",legFav:"зберегти на потім",legAdd:"заспівати сьогодні",
+ instT:"Додай на головний екран",instIos:"iPhone: відкрий цю сторінку в Safari, натисни «Поділитися» (квадрат зі стрілкою), потім «На початковий екран».",
+ instAnd:"Android: у Chrome натисни меню ⋮, потім «Додати на головний екран» або «Установити додаток».",
+ instNote:"Зроби це до того, як почнеш зберігати пісні, щоб списки жили в застосунку.",instBtn:"Установити",
  how:"Як це працює",skip:"Пропустити",next:"Далі",go:"Почати співати",
  tour:[["Language · Язык · Мова","Обери мову застосунку. Її можна змінити будь-коли вгорі вкладки «Пісні»."],
   ["Знайди свою пісню","Шукай за назвою або виконавцем. Пиши українською, російською або латиницею. № — це номер пісні в бібліотеці ведучого."],
@@ -576,18 +603,29 @@ $("host-close").onclick=()=>{$("host").hidden=true};
 const TOUR_IC=[
   ()=>[["en","English"],["ru","Русский"],["uk","Українська"]].map(([l,n])=>{const b=el("button","chip",n);b.type="button";b.setAttribute("aria-pressed",l===S.ui);b.onclick=()=>setLang(l);return b}),
   ()=>{const n=el("span","no","№ 22932");return [demo("add","M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4"),n]},
-  ()=>[demo("fav on",ICON.fav)],()=>[demo("add on",ICON.add)],()=>[demo("done",ICON.done)]];
+  ()=>[demo("fav on",ICON.fav)],()=>[demo("add on",ICON.add)],()=>[demo("done",ICON.done)],
+  ()=>[demo("add","M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM12 8v8M8 12h8")]];
 function demo(cls,d){const b=el("span","ib "+cls);b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+d+'"/></svg>';return b}
+/* add-to-home-screen help: hidden once the app already runs from the home screen */
+const STANDALONE=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const PLAT=/iphone|ipad|ipod/i.test(navigator.userAgent)?"ios":/android/i.test(navigator.userAgent)?"and":"";
+$("inst").hidden=STANDALONE;$("inst-ios").hidden=PLAT==="and";$("inst-and").hidden=PLAT==="ios";
+let installEvt=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;$("inst-btn").hidden=false});
+$("inst-btn").onclick=()=>{if(installEvt){installEvt.prompt();installEvt=null;$("inst-btn").hidden=true}};
+const tourSteps=()=>{const st=[...t("tour")];
+  if(!STANDALONE)st.push([t("instT"),(PLAT==="ios"?t("instIos"):PLAT==="and"?t("instAnd"):t("instIos")+" "+t("instAnd"))+" "+t("instNote")]);
+  return st};
 let tourI=0;
 function tourShow(){
-  const steps=t("tour"),[h,p]=steps[tourI];
+  const steps=tourSteps(),[h,p]=steps[tourI];
   $("tour-ic").replaceChildren(...TOUR_IC[tourI]());$("tour-h").textContent=h;$("tour-p").textContent=p;
   $("tour-dots").replaceChildren(...steps.map((_,i)=>el("i",i===tourI?"on":"")));
   $("tour-next").textContent=t(tourI===steps.length-1?"go":"next");
 }
 function tourOpen(){tourI=0;tourShow();$("tour").hidden=false;$("tour-next").focus()}
 function tourClose(){$("tour").hidden=true;S.tour=1;save()}
-$("tour-next").onclick=()=>{if(tourI<t("tour").length-1){tourI++;tourShow()}else tourClose()};
+$("tour-next").onclick=()=>{if(tourI<tourSteps().length-1){tourI++;tourShow()}else tourClose()};
 $("tour-skip").onclick=tourClose;
 $("how").onclick=()=>{location.hash="songs";show();tourOpen()};
 const afterIntro=()=>{if(!S.tour)tourOpen()};
