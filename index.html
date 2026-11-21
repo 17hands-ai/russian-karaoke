@@ -140,6 +140,13 @@ h1{font-family:var(--display);font-weight:700;font-size:19px;margin:6px 0 0;text
 .inst h2{font-family:var(--display);font-size:15px;margin:0}
 .inst p{margin:0;font-size:14px;color:var(--muted)}
 .inst p.fine{font-size:12px}
+.lost summary{font-family:var(--display);font-size:15px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.lost summary::-webkit-details-marker{display:none}
+.lost summary::after{content:"+";color:var(--gold);font-size:18px;line-height:1}
+.lost[open] summary::after{content:"–"}
+.lost>*+*{margin-top:12px}
+.lost p,.lost ol{font-size:14px;color:var(--muted);margin-bottom:0}
+.lost ol{padding-left:20px}.lost li+li{margin-top:4px}
 .credit{text-align:center;font-size:13px;color:var(--muted);padding:8px 0}
 .credit a{color:var(--gold);font-weight:600;text-decoration:none}
 .fine{font-size:12px;color:var(--muted);margin:0}
@@ -313,6 +320,16 @@ nav .badge{position:absolute;top:2px;left:50%;margin-left:8px;min-width:18px;hei
         <p class="fine" data-i18n="instNote"></p>
         <button class="btn wide" id="inst-btn" hidden data-i18n="instBtn">Install</button>
       </div>
+      <details class="card lost" id="lost">
+        <summary data-i18n="lostT">Can't find your saved songs?</summary>
+        <p data-i18n="lostWhy"></p>
+        <ol id="lost-steps"></ol>
+        <button class="btn ghost wide" id="copy-lists" type="button" data-i18n="copyBtn">Copy my lists</button>
+        <form class="rowform" id="restore-form">
+          <input class="field" id="code-in" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="pastePh" placeholder="Paste the code here">
+          <button class="btn" data-i18n="restoreBtn">Restore</button>
+        </form>
+      </details>
       <button class="btn ghost wide" id="how" data-i18n="how">How it works</button>
       <p class="credit"><span data-i18n="credit">Made for karaoke nights by</span> <a href="https://17hands.ai">17hands.ai</a></p>
     </section>
@@ -397,6 +414,11 @@ en:{by:"brought to you by",welT:"Welcome to Russian Karaoke",welSub:"What are we
  instT:"Keep it on your home screen",instIos:"iPhone: open this page in Safari, tap the Share button (the square with an arrow), then “Add to Home Screen”.",
  instAnd:"Android: in Chrome, tap the ⋮ menu, then “Add to Home screen” or “Install app”.",
  instNote:"Do this before you start saving songs, so your lists live in the app.",instBtn:"Install",
+ lostT:"Can't find your saved songs?",
+ lostWhy:"Your lists are saved inside the browser you used, not in an account. On iPhone, Safari and the home-screen app each keep their own, so songs saved in one don't show up in the other. The same happens with a different browser, a new phone, private mode, or after clearing browser data.",
+ lostSteps:["Open the place where your songs are, for example Safari.","There, go to Me and tap “Copy my lists”.","Come back here, paste the code below and tap “Restore”."],
+ copyBtn:"Copy my lists",pastePh:"Paste the code here",restoreBtn:"Restore",copied:"Copied. Now paste it in the other place",copyManual:"Select the code below and copy it",
+ restored:n=>"Restored "+T.en.nSongs(n),badCode:"That code doesn't look right. Copy it again and paste the whole thing.",needCat:"The catalog is still loading. Try again in a moment.",
  how:"How it works",skip:"Skip",next:"Next",go:"Start singing",
  tour:[["Language · Язык · Мова","Choose the language of the app. You can change it any time at the top of the Songs tab."],
   ["Find your song","Search by song title or singer. Type in Russian, Ukrainian or Latin letters. The № is the song's number in the host's library."],
@@ -424,6 +446,11 @@ ru:{by:"для вас от",welT:"Добро пожаловать в Russian Kar
  instT:"Добавь на экран «Домой»",instIos:"iPhone: открой эту страницу в Safari, нажми «Поделиться» (квадрат со стрелкой), затем «На экран „Домой“».",
  instAnd:"Android: в Chrome нажми меню ⋮, затем «Добавить на главный экран» или «Установить приложение».",
  instNote:"Сделай это до того, как начнёшь сохранять песни, чтобы списки жили в приложении.",instBtn:"Установить",
+ lostT:"Не видишь сохранённые песни?",
+ lostWhy:"Списки хранятся в браузере, которым ты пользовался(ась), а не в аккаунте. На iPhone у Safari и у приложения на экране «Домой» отдельная память, поэтому песни, сохранённые в одном, не видны в другом. То же самое будет в другом браузере, на новом телефоне, в приватном режиме или после очистки данных браузера.",
+ lostSteps:["Открой то место, где остались песни, например Safari.","Там зайди в «Я» и нажми «Скопировать мои списки».","Вернись сюда, вставь код ниже и нажми «Восстановить»."],
+ copyBtn:"Скопировать мои списки",pastePh:"Вставь код сюда",restoreBtn:"Восстановить",copied:"Скопировано. Теперь вставь код в другом месте",copyManual:"Выдели код ниже и скопируй его",
+ restored:n=>"Восстановлено: "+T.ru.nSongs(n),badCode:"Код не подошёл. Скопируй его ещё раз и вставь целиком.",needCat:"Каталог ещё загружается. Попробуй через пару секунд.",
  how:"Как это работает",skip:"Пропустить",next:"Дальше",go:"Начать петь",
  tour:[["Language · Язык · Мова","Выбери язык приложения. Его можно поменять в любой момент вверху вкладки «Песни»."],
   ["Найди свою песню","Ищи по названию или исполнителю. Пиши по-русски, по-украински или латиницей. № — это номер песни в библиотеке ведущего."],
@@ -452,6 +479,11 @@ uk:{by:"для вас від",welT:"Ласкаво просимо до Russian K
  instT:"Додай на головний екран",instIos:"iPhone: відкрий цю сторінку в Safari, натисни «Поділитися» (квадрат зі стрілкою), потім «На початковий екран».",
  instAnd:"Android: у Chrome натисни меню ⋮, потім «Додати на головний екран» або «Установити додаток».",
  instNote:"Зроби це до того, як почнеш зберігати пісні, щоб списки жили в застосунку.",instBtn:"Установити",
+ lostT:"Не бачиш збережених пісень?",
+ lostWhy:"Списки зберігаються у браузері, яким ти користувався(лась), а не в акаунті. На iPhone Safari та застосунок на початковому екрані мають окрему пам'ять, тому пісні, збережені в одному, не видно в іншому. Те саме буде в іншому браузері, на новому телефоні, у приватному режимі або після очищення даних браузера.",
+ lostSteps:["Відкрий те місце, де залишилися пісні, наприклад Safari.","Там зайди в «Я» і натисни «Скопіювати мої списки».","Повернися сюди, встав код нижче й натисни «Відновити»."],
+ copyBtn:"Скопіювати мої списки",pastePh:"Встав код сюди",restoreBtn:"Відновити",copied:"Скопійовано. Тепер встав код в іншому місці",copyManual:"Виділи код нижче і скопіюй його",
+ restored:n=>"Відновлено: "+T.uk.nSongs(n),badCode:"Код не підійшов. Скопіюй його ще раз і встав повністю.",needCat:"Каталог ще завантажується. Спробуй за кілька секунд.",
  how:"Як це працює",skip:"Пропустити",next:"Далі",go:"Почати співати",
  tour:[["Language · Язык · Мова","Обери мову застосунку. Її можна змінити будь-коли вгорі вкладки «Пісні»."],
   ["Знайди свою пісню","Шукай за назвою або виконавцем. Пиши українською, російською або латиницею. № — це номер пісні в бібліотеці ведучого."],
@@ -561,6 +593,7 @@ function applyText(){
   document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
   document.querySelectorAll("[data-i18n-ph]").forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   document.querySelectorAll("[data-ui]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.ui===S.ui));
+  $("lost-steps").replaceChildren(...t("lostSteps").map(x=>el("li",null,x)));
 }
 function render(){
   $("hello").hidden=!!S.name;$("wel-h").textContent=S.name?t("hi")(S.name):t("welT");
@@ -598,6 +631,37 @@ $("show-host").onclick=()=>{const s=BY_ID.get(S.queue[0]);if(!s)return;
   $("h-n").textContent="№ "+(s.no||s.bk);$("h-t").textContent=s.title;$("h-a").textContent=s.artist;$("h-s").textContent=t("singer")+": "+(S.name||t("guest"));$("host").hidden=false};
 $("host-close").onclick=()=>{$("host").hidden=true};
 
+
+/* ---------- MOVE LISTS BETWEEN BROWSERS (a pasteable code; song numbers keep it short) ---------- */
+function exportCode(){
+  const num=id=>{const s=BY_ID.get(id);return s?(s.no||s.bk):0};
+  const o={n:S.name,f:S.favs.map(num).filter(Boolean),q:S.queue.map(num).filter(Boolean),
+    s:Object.entries(S.sung).map(([id,r])=>[num(id),r.n,Math.round(r.last/1000)]).filter(x=>x[0])};
+  return "RK1-"+btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function importCode(code){
+  const m=/RK1-([\w-]+)/.exec(code.replace(/\s+/g,""));if(!m)throw 0;
+  const o=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,"+").replace(/_/g,"/")))));
+  const byNo=new Map(SONGS.map(s=>[s.no||s.bk,s.id])),ids=a=>(Array.isArray(a)?a:[]).map(n=>byNo.get(n)).filter(Boolean);
+  const before=new Set([...S.favs,...S.queue,...Object.keys(S.sung)]);
+  for(const id of ids(o.f))if(!S.favs.includes(id))S.favs.push(id);
+  for(const id of ids(o.q))if(!S.queue.includes(id))S.queue.push(id);
+  for(const [no,n,last] of Array.isArray(o.s)?o.s:[]){const id=byNo.get(no);if(!id)continue;
+    const r=S.sung[id]||{n:0,last:0};S.sung[id]={n:Math.max(r.n,+n||1),last:Math.max(r.last,(+last||0)*1000)}}
+  if(!S.name&&typeof o.n==="string")S.name=o.n.slice(0,24);
+  const after=new Set([...S.favs,...S.queue,...Object.keys(S.sung)]);
+  save();render();return after.size-before.size;
+}
+$("copy-lists").onclick=async()=>{
+  if(!LOADED){toast(t("needCat"));return}
+  const code=exportCode();
+  try{await navigator.clipboard.writeText(code);toast(t("copied"))}
+  catch(e){const f=$("code-in");f.value=code;f.focus();f.select();toast(t("copyManual"))}
+};
+$("restore-form").onsubmit=e=>{e.preventDefault();
+  if(!LOADED){toast(t("needCat"));return}
+  try{const n=importCode($("code-in").value);$("code-in").value="";toast(t("restored")(n))}catch(err){toast(t("badCode"))}
+};
 
 /* ---------- WALKTHROUGH ---------- */
 const TOUR_IC=[
