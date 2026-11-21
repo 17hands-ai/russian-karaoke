@@ -7,8 +7,8 @@ Guests search the catalog by song or singer (Russian, Ukrainian or Latin letters
 ## Files
 
 - `index.html` — the whole app (no build step)
-- `songs.json` — the catalog: one artist per line, `[artist, [[title, №, № with backing vocals], …]]`; `0` means that version does not exist
-- `tools/build.py` — rebuilds `songs.json` from the Excel export
+- `songs.json` — the catalog: one artist per line, `[artist, [[title, №, № with backing vocals], …]]`; `0` means that version does not exist. Guests see the backing-vocals № first, because that is the version the host plays by default. Russian and Ukrainian songs only for now
+- `tools/build.py` — rebuilds `songs.json` from the Excel export (drops the trailing `+` some titles carry and merges plain and backing-vocals rows into one song)
 
 ## Deploy
 

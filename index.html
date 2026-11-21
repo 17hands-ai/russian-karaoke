@@ -104,7 +104,8 @@ h1{font-family:var(--display);font-weight:700;font-size:19px;margin:6px 0 0;text
 .song .t{font-weight:600;font-size:15px;letter-spacing:.01em;overflow-wrap:anywhere}
 .song .a{font-size:12px;letter-spacing:.03em;color:var(--muted);overflow-wrap:anywhere}
 .song .meta{font-size:12px;color:var(--mint);margin-top:2px}
-.song .bk{font-size:12px;color:var(--gold);margin-top:2px}
+.song .bk{font-size:12px;color:var(--muted);margin-top:2px}
+.tour-ic .bk{font-size:13px;color:var(--gold)}
 .song .no{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none;text-align:right;white-space:nowrap}
 .song .no i{display:block;font-style:normal;font-size:11px;color:var(--gold)}
 .acts{display:flex;gap:6px;flex:none}
@@ -262,9 +263,9 @@ nav .badge{position:absolute;top:2px;left:50%;margin-left:8px;min-width:18px;hei
         <button class="chip" data-lang="all" aria-pressed="true" data-i18n="cAll">All</button>
         <button class="chip" data-lang="ru" aria-pressed="false">Русские</button>
         <button class="chip" data-lang="uk" aria-pressed="false">Українські</button>
-        <button class="chip" data-lang="en" aria-pressed="false" data-i18n="cLat">Latin</button>
         <span class="count" id="count"></span>
       </div>
+      <p class="fine" data-i18n="libNote">Russian and Ukrainian songs only for now. English songs are coming at future events.</p>
       <div class="legend" aria-hidden="true">
         <span><svg viewBox="0 0 24 24" class="lf"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span data-i18n="legFav">save for later</span></span>
         <span><svg viewBox="0 0 24 24" class="la"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="legAdd">sing tonight</span></span>
@@ -378,7 +379,7 @@ nav .badge{position:absolute;top:2px;left:50%;margin-left:8px;min-width:18px;hei
 const TR={а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"kh",ц:"ts",ч:"ch",ш:"sh",щ:"shch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya",і:"i",ї:"i",є:"e",ґ:"g"};
 const norm = s => s.normalize("NFC").toLowerCase().replace(/ё/g,"е").replace(/[^\p{L}\p{N}]+/gu," ").trim();
 const latin = s => s.replace(/[а-яіїєґ]/g,c=>TR[c]??c).replace(/shch/g,"sh").replace(/kh/g,"h").replace(/[yj]/g,"i");
-const langOf = s => /[іїєґ]|[а-яё]i|i[а-яё]/i.test(s)?"uk":/[а-яё]/i.test(s)?"ru":/[a-z]/i.test(s)?"en":"ru";
+const langOf = s => /[іїєґ]|[а-яё]i|i[а-яё]/i.test(s)?"uk":"ru";
 const SONGS=[], BY_ID=new Map();
 let LOADED=false, LOAD_ERR=false;
 function addArtist([artist,list]){
@@ -422,6 +423,7 @@ en:{by:"brought to you by",welT:"Welcome to Russian Karaoke",welSub:"What are we
  how:"How it works",skip:"Skip",next:"Next",go:"Start singing",
  tour:[["Language · Язык · Мова","Choose the language of the app. You can change it any time at the top of the Songs tab."],
   ["Find your song","Search by song title or singer. Type in Russian, Ukrainian or Latin letters. The № is the song's number in the host's library."],
+  ["Which number to give the host","The big № is the version the host plays by default. If it says “backing”, it comes with backing vocals. Prefer to sing without them? If the song shows a “Without backing vocals” number, give the host that one."],
   ["The heart saves it for good","Tap the heart to keep a song in Favorites. It stays there for every future karaoke night."],
   ["The plus adds it to tonight","Tap + to line a song up for tonight only. When it's your turn, open Tonight and show the host your next song."],
   ["Done singing? Tap the check","The song leaves tonight's list and goes into your history under Me, so you remember what you've already sung."]],
@@ -440,7 +442,7 @@ en:{by:"brought to you by",welT:"Welcome to Russian Karaoke",welSub:"What are we
  noSung:"Your stage history starts tonight",noSungS:"When you finish a song, tap the check mark in Tonight.",
  added:"Added to tonight",already:"Already in tonight's list",removed:"Removed",faved:"Saved to favorites",
  unfaved:"Removed from favorites",sang:"Nice one! Saved to your history",sungMeta:(n,d)=>"Sung "+n+"× · last "+d,
- loading:"Loading the catalog…",loadErr:"The catalog didn't load. Check your connection and reload the page.",cLat:"Latin",bk:"backing",bkAlso:n=>"With backing vocals: № "+n,
+ loading:"Loading the catalog…",loadErr:"The catalog didn't load. Check your connection and reload the page.",libNote:"Russian and Ukrainian songs only for now. English songs are coming at future events.",bk:"backing",noBk:n=>"Without backing vocals: № "+n,
  aFav:"Favorite",aAdd:"Add to tonight",aDone:"I sang it",aUp:"Move up",aDown:"Move down",aRem:"Remove",hi:n=>"Welcome, "+n+"!"},
 ru:{by:"для вас от",welT:"Добро пожаловать в Russian Karaoke",welSub:"Что поём сегодня?",legFav:"сохранить на потом",legAdd:"спеть сегодня",
  instT:"Добавь на экран «Домой»",instIos:"iPhone: открой эту страницу в Safari, нажми «Поделиться» (квадрат со стрелкой), затем «На экран „Домой“».",
@@ -454,6 +456,7 @@ ru:{by:"для вас от",welT:"Добро пожаловать в Russian Kar
  how:"Как это работает",skip:"Пропустить",next:"Дальше",go:"Начать петь",
  tour:[["Language · Язык · Мова","Выбери язык приложения. Его можно поменять в любой момент вверху вкладки «Песни»."],
   ["Найди свою песню","Ищи по названию или исполнителю. Пиши по-русски, по-украински или латиницей. № — это номер песни в библиотеке ведущего."],
+  ["Какой номер назвать ведущему","Крупный № — это версия, которую ведущий ставит по умолчанию. Пометка «бэк» значит, что она с бэк-вокалом. Хочешь петь без него? Если у песни есть строка «Без бэк-вокала», назови ведущему этот номер."],
   ["Сердечко сохраняет навсегда","Нажми на сердечко, и песня останется в «Любимых» для всех следующих караоке-вечеров."],
   ["Плюс добавляет на сегодня","Нажми +, чтобы поставить песню в список только на сегодня. Когда подойдёт твоя очередь, открой «Сегодня» и покажи ведущему следующую песню."],
   ["Спел(а)? Нажми галочку","Песня уйдёт из списка на сегодня и попадёт в твою историю во вкладке «Я», чтобы ты помнил(а), что уже пел(а)."]],
@@ -472,7 +475,7 @@ ru:{by:"для вас от",welT:"Добро пожаловать в Russian Kar
  noSung:"История начнётся сегодня",noSungS:"Когда споёшь, нажми галочку во вкладке «Сегодня».",
  added:"Добавлено на сегодня",already:"Уже в списке на сегодня",removed:"Убрано",faved:"Добавлено в любимые",
  unfaved:"Убрано из любимых",sang:"Браво! Сохранено в истории",sungMeta:(n,d)=>"Спето "+n+"× · "+d,
- loading:"Загружаем каталог…",loadErr:"Каталог не загрузился. Проверь интернет и обнови страницу.",cLat:"Латиница",bk:"бэк",bkAlso:n=>"С бэк-вокалом: № "+n,
+ loading:"Загружаем каталог…",loadErr:"Каталог не загрузился. Проверь интернет и обнови страницу.",libNote:"Пока только русские и украинские песни. Английские появятся на следующих вечерах.",bk:"бэк",noBk:n=>"Без бэк-вокала: № "+n,
  aFav:"В любимые",aAdd:"Добавить на сегодня",aDone:"Спето",aUp:"Выше",aDown:"Ниже",aRem:"Убрать",hi:n=>"Привет, "+n+"!"}
 ,
 uk:{by:"для вас від",welT:"Ласкаво просимо до Russian Karaoke",welSub:"Що співаємо сьогодні?",legFav:"зберегти на потім",legAdd:"заспівати сьогодні",
@@ -487,6 +490,7 @@ uk:{by:"для вас від",welT:"Ласкаво просимо до Russian K
  how:"Як це працює",skip:"Пропустити",next:"Далі",go:"Почати співати",
  tour:[["Language · Язык · Мова","Обери мову застосунку. Її можна змінити будь-коли вгорі вкладки «Пісні»."],
   ["Знайди свою пісню","Шукай за назвою або виконавцем. Пиши українською, російською або латиницею. № — це номер пісні в бібліотеці ведучого."],
+  ["Який номер назвати ведучому","Великий № — це версія, яку ведучий вмикає за замовчуванням. Позначка «бек» означає, що вона з бек-вокалом. Хочеш співати без нього? Якщо в пісні є рядок «Без бек-вокалу», назви ведучому цей номер."],
   ["Сердечко зберігає назавжди","Натисни на сердечко, і пісня залишиться в «Улюблених» для всіх наступних караоке-вечорів."],
   ["Плюс додає на сьогодні","Натисни +, щоб поставити пісню у список лише на сьогодні. Коли настане твоя черга, відкрий «Сьогодні» й покажи ведучому наступну пісню."],
   ["Заспівав(ла)? Натисни галочку","Пісня зникне зі списку на сьогодні й потрапить до твоєї історії у вкладці «Я», щоб ти пам'ятав(ла), що вже співав(ла)."]],
@@ -505,7 +509,7 @@ uk:{by:"для вас від",welT:"Ласкаво просимо до Russian K
  noSung:"Історія почнеться сьогодні",noSungS:"Коли заспіваєш, натисни галочку у вкладці «Сьогодні».",
  added:"Додано на сьогодні",already:"Уже в списку на сьогодні",removed:"Прибрано",faved:"Додано до улюблених",
  unfaved:"Прибрано з улюблених",sang:"Браво! Збережено в історії",sungMeta:(n,d)=>"Заспівано "+n+"× · "+d,
- loading:"Завантажуємо каталог…",loadErr:"Каталог не завантажився. Перевір інтернет і онови сторінку.",cLat:"Латиниця",bk:"бек",bkAlso:n=>"З бек-вокалом: № "+n,
+ loading:"Завантажуємо каталог…",loadErr:"Каталог не завантажився. Перевір інтернет і онови сторінку.",libNote:"Поки що лише російські та українські пісні. Англійські з'являться на наступних вечорах.",bk:"бек",noBk:n=>"Без бек-вокалу: № "+n,
  aFav:"До улюблених",aAdd:"Додати на сьогодні",aDone:"Заспівано",aUp:"Вище",aDown:"Нижче",aRem:"Прибрати",hi:n=>"Привіт, "+n+"!"}
 };
 function plural(n,a,b,c){const m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<12||h>14)?b:c}
@@ -537,9 +541,9 @@ function row(s,o={}){
   const li=el("li","song");
   if(o.num)li.append(el("span","num",o.num));
   const x=el("div","txt");x.append(el("div","t",s.title),el("div","a",s.artist));
-  if(s.no&&s.bk)x.append(el("div","bk",t("bkAlso")(s.bk)));
+  if(s.no&&s.bk)x.append(el("div","bk",t("noBk")(s.no)));
   if(o.meta)x.append(el("div","meta",o.meta));
-  const n=el("span","no","№ "+(s.no||s.bk));if(!s.no)n.append(el("i",null,t("bk")));
+  const n=el("span","no","№ "+(s.bk||s.no));if(s.bk)n.append(el("i",null,t("bk")));
   li.append(x,n);
   const a=el("div","acts");
   if(o.queue){
@@ -628,7 +632,7 @@ $("surprise").onclick=()=>{const pool=S.favs.filter(id=>BY_ID.has(id)&&!S.queue.
   if(!pool.length){toast(t("already"));return}
   const id=pool[Math.floor(Math.random()*pool.length)];S.queue.push(id);save();render();toast(BY_ID.get(id).title+" · "+t("added"))};
 $("show-host").onclick=()=>{const s=BY_ID.get(S.queue[0]);if(!s)return;
-  $("h-n").textContent="№ "+(s.no||s.bk);$("h-t").textContent=s.title;$("h-a").textContent=s.artist;$("h-s").textContent=t("singer")+": "+(S.name||t("guest"));$("host").hidden=false};
+  $("h-n").textContent="№ "+(s.bk||s.no)+(s.bk?" · "+t("bk"):"");$("h-t").textContent=s.title;$("h-a").textContent=s.artist;$("h-s").textContent=t("singer")+": "+(S.name||t("guest"));$("host").hidden=false};
 $("host-close").onclick=()=>{$("host").hidden=true};
 
 
@@ -667,6 +671,7 @@ $("restore-form").onsubmit=e=>{e.preventDefault();
 const TOUR_IC=[
   ()=>[["en","English"],["ru","Русский"],["uk","Українська"]].map(([l,n])=>{const b=el("button","chip",n);b.type="button";b.setAttribute("aria-pressed",l===S.ui);b.onclick=()=>setLang(l);return b}),
   ()=>{const n=el("span","no","№ 22932");return [demo("add","M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4"),n]},
+  ()=>[el("span","no","№ 2"),el("span","bk",t("bk"))],
   ()=>[demo("fav on",ICON.fav)],()=>[demo("add on",ICON.add)],()=>[demo("done",ICON.done)],
   ()=>[demo("add","M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM12 8v8M8 12h8")]];
 function demo(cls,d){const b=el("span","ib "+cls);b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+d+'"/></svg>';return b}

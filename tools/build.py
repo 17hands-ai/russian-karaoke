@@ -1,8 +1,9 @@
-import xlrd,json,sys,unicodedata,collections
+import xlrd,json,sys,unicodedata,collections,re
 sh=xlrd.open_workbook(sys.argv[1]).sheet_by_index(0)
 groups=collections.OrderedDict(); anomalies=0
 for r in range(1,sh.nrows):
     no,title,artist,bek=[unicodedata.normalize('NFC',str(sh.cell_value(r,c)).strip()) for c in range(4)]
+    title=re.sub(r'\s*\+$','',title)  # the export marks some titles with a trailing '+'; not shown to guests
     g=groups.setdefault((artist,title),[0,0])
     i=1 if bek else 0
     if g[i]: anomalies+=1; continue
