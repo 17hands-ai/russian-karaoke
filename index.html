@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Спой-ка Karaoke Songbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one phone-width column — brand bar, scrolling list, thumb-reach tab bar.
+   One visual world (karaoke night, 17hands gold), so single dark theme by choice. */
+:root{
+  color-scheme: dark;
+  --night:#1a1024;      /* page */
+  --plum:#281838;       /* cards, bars */
+  --plum-2:#35214a;     /* inputs, pressed */
+  --line:#4a3463;       /* hairlines */
+  --cream:#fbf1de;      /* text */
+  --muted:#b9a6cc;      /* secondary text */
+  --gold:#f0bf4c;       /* 17hands accent */
+  --pink:#ff86b3;       /* favorites */
+  --mint:#7fe0c0;       /* sung */
+  --display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--night);color:var(--cream);font-family:var(--body);font-size:16px;line-height:1.35;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+
+.app{height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;
+  background:radial-gradient(120% 40% at 50% 0%,#3a1f52 0%,var(--night) 70%)}
+
+/* brand bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 10px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo b{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--gold)}
+.eq{display:flex;align-items:flex-end;gap:3px;height:20px}
+.eq i{width:4px;border-radius:2px;background:var(--pink);animation:eq 1.1s ease-in-out infinite}
+.eq i:nth-child(1){height:40%}.eq i:nth-child(2){height:100%;animation-delay:-.3s}
+.eq i:nth-child(3){height:65%;animation-delay:-.6s}
+@keyframes eq{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
+.eq i{transform-origin:bottom}
+.by{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);text-decoration:none}
+.by span.n{font-family:var(--display);font-weight:700;font-size:11px;color:var(--night);background:var(--gold);
+  border-radius:7px;padding:3px 5px;line-height:1}
+.by strong{color:var(--cream);font-weight:600}
+
+/* main */
+main{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 20px;display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--display);font-weight:700;font-size:19px;margin:6px 0 0;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0}
+.card{background:var(--plum);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+
+/* welcome */
+.hello{display:flex;flex-direction:column;gap:10px;border-color:var(--gold)}
+.hello h2{font-family:var(--display);font-size:16px;margin:0}
+.rowform{display:flex;gap:8px}
+.field{flex:1;min-width:0;background:var(--plum-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.field::placeholder{color:#927fa6}
+.btn{background:var(--gold);color:var(--night);font-weight:700;border-radius:12px;padding:12px 16px;white-space:nowrap}
+.btn.ghost{background:var(--plum-2);color:var(--cream);border:1px solid var(--line);font-weight:600}
+.btn.wide{width:100%}
+.btn:active{transform:translateY(1px)}
+
+/* search */
+.search{display:flex;flex-direction:column;gap:8px}
+.search label{display:flex;align-items:center;gap:10px;background:var(--plum-2);border:1px solid var(--line);
+  border-radius:14px;padding:0 12px}
+.search label:focus-within{border-color:var(--gold)}
+.search label span{font-size:12px;font-weight:600;color:var(--gold);width:58px;flex:none;text-transform:uppercase;letter-spacing:.04em}
+.search input{flex:1;min-width:0;background:none;border:0;padding:13px 0;outline:none}
+.search input::placeholder{color:#927fa6}
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--cream);color:var(--night);border-color:var(--cream)}
+.count{margin-left:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* song rows */
+.list{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
+.song{display:flex;align-items:center;gap:10px;background:var(--plum);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 10px 10px 14px}
+.song .num{font-family:var(--display);font-size:13px;color:var(--gold);width:22px;flex:none;font-variant-numeric:tabular-nums}
+.song .txt{flex:1;min-width:0}
+.song .t{font-weight:600;font-size:15px;letter-spacing:.01em;overflow-wrap:anywhere}
+.song .a{font-size:12px;letter-spacing:.03em;color:var(--muted);overflow-wrap:anywhere}
+.song .meta{font-size:12px;color:var(--mint);margin-top:2px}
+.song .bk{font-size:12px;color:var(--gold);margin-top:2px}
+.song .no{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none;text-align:right;white-space:nowrap}
+.song .no i{display:block;font-style:normal;font-size:11px;color:var(--gold)}
+.acts{display:flex;gap:6px;flex:none}
+.ib{width:40px;height:40px;border-radius:12px;background:var(--plum-2);display:grid;place-items:center;color:var(--muted)}
+.ib svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib.fav.on{color:var(--pink);background:#4a2143}
+.ib.fav.on svg{fill:currentColor}
+.ib.add{color:var(--gold)}
+.ib.add.on{background:var(--gold);color:var(--night)}
+.ib.done{color:var(--mint)}
+.ib.sm{width:34px;height:34px;border-radius:10px}
+.ib:disabled{opacity:.3;cursor:default}
+.pop{animation:pop .3s ease}
+@keyframes pop{40%{transform:scale(1.25)}}
+
+.empty{text-align:center;color:var(--muted);padding:28px 12px;border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;color:var(--cream);font-family:var(--display);font-size:15px;margin-bottom:6px}
+.more{align-self:center}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+.bar .btn{flex:1}
+
+/* profile */
+.me{display:flex;align-items:center;gap:12px}
+.ava{width:52px;height:52px;border-radius:50%;background:var(--gold);color:var(--night);display:grid;place-items:center;
+  font-family:var(--display);font-weight:800;font-size:20px;flex:none}
+.me .who{flex:1;min-width:0}
+.me .who b{display:block;font-size:18px;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--plum);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.credit{text-align:center;font-size:13px;color:var(--muted);padding:8px 0}
+.credit a{color:var(--gold);font-weight:600;text-decoration:none}
+.fine{font-size:12px;color:var(--muted);margin:0}
+
+/* tabs */
+nav{display:grid;grid-template-columns:repeat(4,1fr);background:var(--plum);border-top:1px solid var(--line);padding:6px 6px 8px}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;
+  font-size:11px;font-weight:600;color:var(--muted);position:relative}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button[aria-current="page"]{color:var(--gold)}
+nav .badge{position:absolute;top:2px;left:50%;margin-left:8px;min-width:18px;height:18px;border-radius:9px;padding:0 5px;
+  background:var(--pink);color:var(--night);font-size:11px;line-height:18px;font-variant-numeric:tabular-nums}
+
+/* toast + host card */
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--cream);color:var(--night);
+  font-weight:600;font-size:14px;border-radius:999px;padding:9px 16px;max-width:calc(100% - 32px);text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.host{position:fixed;inset:0;background:var(--gold);color:var(--night);display:flex;flex-direction:column;
+  justify-content:center;gap:14px;padding:28px;text-align:center;z-index:5}
+.host small{font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px}
+.host .ht{font-family:var(--display);font-weight:800;font-size:clamp(28px,9vw,46px);line-height:1.1;overflow-wrap:anywhere}
+.host .ha{font-size:22px;font-weight:600}
+.host .hn{font-family:var(--display);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums}
+.host .hs{font-size:18px;margin-top:10px}
+.host button{margin:18px auto 0;background:var(--night);color:var(--cream);border-radius:12px;padding:12px 22px;font-weight:700}
+
+@media (prefers-reduced-motion:reduce){.eq i,.pop{animation:none}.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">
+      <div class="eq" aria-hidden="true"><i></i><i></i><i></i></div>
+      <b>Спой-ка</b>
+    </div>
+    <a class="by" href="https://17hands.ai"><span data-i18n="by">karaoke by</span> <span class="n">17</span><strong>hands.ai</strong></a>
+  </header>
+
+  <main id="main">
+    <!-- SONGS -->
+    <section id="v-songs" style="display:contents">
+      <form class="card hello" id="hello" hidden>
+        <h2 data-i18n="helloT">Hi! What should the host call you?</h2>
+        <div class="rowform">
+          <input class="field" id="name-in" maxlength="24" autocomplete="nickname" data-i18n-ph="namePh" placeholder="Your name">
+          <button class="btn" data-i18n="helloGo">Let's sing</button>
+        </div>
+        <p class="fine" data-i18n="helloFine">No password, no email. Your lists stay on this phone.</p>
+      </form>
+      <div class="search">
+        <label><span data-i18n="fSong">Song</span><input id="q-title" type="search" enterkeyhint="search" autocomplete="off" data-i18n-ph="fSongPh" placeholder="Title, in Russian or English"></label>
+        <label><span data-i18n="fSinger">Singer</span><input id="q-artist" type="search" enterkeyhint="search" autocomplete="off" data-i18n-ph="fSingerPh" placeholder="Artist or band"></label>
+      </div>
+      <div class="chips">
+        <button class="chip" data-lang="all" aria-pressed="true" data-i18n="cAll">All</button>
+        <button class="chip" data-lang="ru" aria-pressed="false">Русские</button>
+        <button class="chip" data-lang="uk" aria-pressed="false">Українські</button>
+        <button class="chip" data-lang="en" aria-pressed="false" data-i18n="cLat">Latin</button>
+        <span class="count" id="count"></span>
+      </div>
+      <ul class="list" id="results"></ul>
+      <button class="btn ghost more" id="more" hidden data-i18n="more">Show more</button>
+    </section>
+
+    <!-- TONIGHT -->
+    <section id="v-tonight" style="display:contents" hidden>
+      <div><h1 data-i18n="tonT">My list for tonight</h1><p class="sub" id="ton-sub"></p></div>
+      <div class="bar" id="ton-bar">
+        <button class="btn" id="show-host" data-i18n="showHost">Show the host my next song</button>
+      </div>
+      <ul class="list" id="queue"></ul>
+    </section>
+
+    <!-- FAVORITES -->
+    <section id="v-favorites" style="display:contents" hidden>
+      <div><h1 data-i18n="favT">My go-to songs</h1><p class="sub" data-i18n="favSub">Your favorites, ready for the next karaoke night.</p></div>
+      <div class="bar" id="fav-bar"><button class="btn ghost" id="surprise" data-i18n="surprise">Pick one for me</button></div>
+      <ul class="list" id="favs"></ul>
+    </section>
+
+    <!-- ME -->
+    <section id="v-me" style="display:contents" hidden>
+      <div class="card me">
+        <div class="ava" id="ava">?</div>
+        <div class="who"><b id="me-name"></b><span class="sub" data-i18n="meSub">Saved on this phone</span></div>
+        <button class="btn ghost" id="rename" data-i18n="rename">Rename</button>
+      </div>
+      <form class="rowform" id="rename-form" hidden>
+        <input class="field" id="rename-in" maxlength="24" data-i18n-ph="namePh" placeholder="Your name">
+        <button class="btn" data-i18n="save">Save</button>
+      </form>
+      <div class="stats">
+        <div class="stat"><b id="s-fav">0</b><span data-i18n="sFav">favorites</span></div>
+        <div class="stat"><b id="s-sung">0</b><span data-i18n="sSung">songs sung</span></div>
+        <div class="stat"><b id="s-times">0</b><span data-i18n="sTimes">times on stage</span></div>
+      </div>
+      <div><h1 data-i18n="sungT">I've sung these before</h1></div>
+      <ul class="list" id="sung"></ul>
+      <div class="chips">
+        <span class="sub" data-i18n="langL">Language</span>
+        <button class="chip" data-ui="en" aria-pressed="true">English</button>
+        <button class="chip" data-ui="ru" aria-pressed="false">Русский</button>
+        <button class="chip" data-ui="uk" aria-pressed="false">Українська</button>
+      </div>
+      <p class="credit"><span data-i18n="credit">Made for karaoke nights by</span> <a href="https://17hands.ai">17hands.ai</a></p>
+    </section>
+  </main>
+
+  <nav aria-label="Sections">
+    <button data-tab="songs"><svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span data-i18n="tabSongs">Songs</span></button>
+    <button data-tab="tonight"><svg viewBox="0 0 24 24"><path d="M4 7h10M4 12h10M4 17h6M18 17V6l3 1"/><circle cx="16" cy="17" r="2"/></svg><span data-i18n="tabTon">Tonight</span><i class="badge" id="b-ton" hidden></i></button>
+    <button data-tab="favorites"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span data-i18n="tabFav">Favorites</span></button>
+    <button data-tab="me"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0"/></svg><span data-i18n="tabMe">Me</span></button>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="host" id="host" hidden>
+  <small data-i18n="hostNext">Next song</small>
+  <div class="hn" id="h-n"></div>
+  <div class="ht" id="h-t"></div>
+  <div class="ha" id="h-a"></div>
+  <div class="hs" id="h-s"></div>
+  <button id="host-close" data-i18n="close">Close</button>
+</div>
+
+<script>
+/* ---------- CATALOG ----------
+   songs.json sits beside this page: one artist per line, [artist, [[title, №, № with backing vocals], …]].
+   0 means that version does not exist. Rebuild it from the Excel export with build.py. */
+const TR={а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"kh",ц:"ts",ч:"ch",ш:"sh",щ:"shch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya",і:"i",ї:"i",є:"e",ґ:"g"};
+const norm = s => s.normalize("NFC").toLowerCase().replace(/ё/g,"е").replace(/[^\p{L}\p{N}]+/gu," ").trim();
+const latin = s => s.replace(/[а-яіїєґ]/g,c=>TR[c]??c).replace(/shch/g,"sh").replace(/kh/g,"h").replace(/[yj]/g,"i");
+const langOf = s => /[іїєґ]|[а-яё]i|i[а-яё]/i.test(s)?"uk":/[а-яё]/i.test(s)?"ru":/[a-z]/i.test(s)?"en":"ru";
+const SONGS=[], BY_ID=new Map();
+let LOADED=false, LOAD_ERR=false;
+function addArtist([artist,list]){
+  const an=norm(artist), al=latin(an);
+  for(const [title,no,bk] of list){
+    const tn=norm(title);let id=an+"|"+tn;
+    for(let k=2;BY_ID.has(id);k++)id=an+"|"+tn+"|"+k;
+    const s={id,title,artist,no,bk,lang:langOf(title),tn,an,tl:latin(tn),al};
+    SONGS.push(s);BY_ID.set(id,s);
+  }
+}
+async function loadCatalog(){
+  try{const r=await fetch("songs.json");if(!r.ok)throw 0;(await r.json()).forEach(addArtist);LOADED=true}
+  catch(e){LOAD_ERR=true}
+  render();
+}
+/* every word typed must appear, in Cyrillic or in Latin letters, in any order */
+const words = q => {const n=norm(q);return n?n.split(" ").map(w=>[w,latin(w)]):[]};
+const hit = (key,lat,ws) => ws.every(([w,l])=>key.includes(w)||lat.includes(l));
+
+/* ---------- STATE (kept on this device) ---------- */
+const KEY="spoyka.v1";
+let S={name:"",ui:(l=>l.startsWith("uk")?"uk":l.startsWith("ru")?"ru":"en")(navigator.language||"en"),favs:[],queue:[],sung:{}};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+Object.assign(S,window.claude?.hot?.data?.S||{});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+window.claude?.hot?.snapshot?.(()=>({S}));
+let view={lang:"all",limit:40};
+
+/* ---------- TEXT ---------- */
+const T={
+en:{by:"karaoke by",helloT:"Hi! What should the host call you?",namePh:"Your name",helloGo:"Let's sing",
+ helloFine:"No password, no email. Your lists stay on this phone.",fSong:"Song",fSinger:"Singer",
+ fSongPh:"Title, Cyrillic or Latin letters",fSingerPh:"Artist or band",cAll:"All",more:"Show more",
+ tonT:"My list for tonight",showHost:"Show the host my next song",favT:"My go-to songs",
+ favSub:"Your favorites, ready for the next karaoke night.",surprise:"Pick one for me",meSub:"Saved on this phone",
+ rename:"Rename",save:"Save",sFav:"favorites",sSung:"songs sung",sTimes:"times on stage",sungT:"I've sung these before",
+ langL:"Language",credit:"Made for karaoke nights by",tabSongs:"Songs",tabTon:"Tonight",tabFav:"Favorites",tabMe:"Me",
+ hostNext:"Next song",close:"Close",guest:"Guest",singer:"Singer",
+ nSongs:n=>n+(n===1?" song":" songs"),tonSub:n=>n+(n===1?" song":" songs"),
+ noRes:"No songs match",noResS:"Check the spelling, or try just the first few letters.",
+ noTon:"Nothing lined up yet",noTonS:"Tap + on any song to add it to tonight's list.",
+ noFav:"No favorites yet",noFavS:"Tap the heart on a song you love. It will wait for you here.",
+ noSung:"Your stage history starts tonight",noSungS:"When you finish a song, tap the check mark in Tonight.",
+ added:"Added to tonight",already:"Already in tonight's list",removed:"Removed",faved:"Saved to favorites",
+ unfaved:"Removed from favorites",sang:"Nice one! Saved to your history",sungMeta:(n,d)=>"Sung "+n+"× · last "+d,
+ loading:"Loading the catalog…",loadErr:"The catalog didn't load. Check your connection and reload the page.",cLat:"Latin",bk:"backing",bkAlso:n=>"With backing vocals: № "+n,
+ aFav:"Favorite",aAdd:"Add to tonight",aDone:"I sang it",aUp:"Move up",aDown:"Move down",aRem:"Remove",hi:n=>"Welcome, "+n+"!"},
+ru:{by:"караоке от",helloT:"Привет! Как тебя объявить?",namePh:"Твоё имя",helloGo:"Поехали",
+ helloFine:"Без пароля и почты. Списки хранятся на этом телефоне.",fSong:"Песня",fSinger:"Певец",
+ fSongPh:"Название, кириллицей или латиницей",fSingerPh:"Исполнитель или группа",cAll:"Все",more:"Показать ещё",
+ tonT:"Мой список на сегодня",showHost:"Показать ведущему мою песню",favT:"Мои любимые",
+ favSub:"Любимые песни ждут следующего караоке.",surprise:"Выбери за меня",meSub:"Сохранено на этом телефоне",
+ rename:"Изменить",save:"Сохранить",sFav:"любимых",sSung:"спето песен",sTimes:"выходов на сцену",sungT:"Я уже пел(а) это",
+ langL:"Язык",credit:"Сделано для караоке-вечеров в",tabSongs:"Песни",tabTon:"Сегодня",tabFav:"Любимые",tabMe:"Я",
+ hostNext:"Следующая песня",close:"Закрыть",guest:"Гость",singer:"Поёт",
+ nSongs:n=>n+" "+plural(n,"песня","песни","песен"),tonSub:n=>n+" "+plural(n,"песня","песни","песен"),
+ noRes:"Ничего не нашлось",noResS:"Проверь написание или введи первые буквы.",
+ noTon:"Пока пусто",noTonS:"Нажми + у любой песни, чтобы добавить её на сегодня.",
+ noFav:"Любимых пока нет",noFavS:"Нажми на сердечко у песни, и она будет ждать тебя здесь.",
+ noSung:"История начнётся сегодня",noSungS:"Когда споёшь, нажми галочку во вкладке «Сегодня».",
+ added:"Добавлено на сегодня",already:"Уже в списке на сегодня",removed:"Убрано",faved:"Добавлено в любимые",
+ unfaved:"Убрано из любимых",sang:"Браво! Сохранено в истории",sungMeta:(n,d)=>"Спето "+n+"× · "+d,
+ loading:"Загружаем каталог…",loadErr:"Каталог не загрузился. Проверь интернет и обнови страницу.",cLat:"Латиница",bk:"бэк",bkAlso:n=>"С бэк-вокалом: № "+n,
+ aFav:"В любимые",aAdd:"Добавить на сегодня",aDone:"Спето",aUp:"Выше",aDown:"Ниже",aRem:"Убрать",hi:n=>"Привет, "+n+"!"}
+,
+uk:{by:"караоке від",helloT:"Привіт! Як тебе оголосити?",namePh:"Твоє ім'я",helloGo:"Поїхали",
+ helloFine:"Без пароля й пошти. Списки зберігаються на цьому телефоні.",fSong:"Пісня",fSinger:"Співак",
+ fSongPh:"Назва, кирилицею або латиницею",fSingerPh:"Виконавець або гурт",cAll:"Усі",more:"Показати ще",
+ tonT:"Мій список на сьогодні",showHost:"Показати ведучому мою пісню",favT:"Мої улюблені",
+ favSub:"Улюблені пісні чекають наступного караоке.",surprise:"Обери за мене",meSub:"Збережено на цьому телефоні",
+ rename:"Змінити",save:"Зберегти",sFav:"улюблених",sSung:"заспівано пісень",sTimes:"виходів на сцену",sungT:"Я вже це співав(ла)",
+ langL:"Мова",credit:"Зроблено для караоке-вечорів у",tabSongs:"Пісні",tabTon:"Сьогодні",tabFav:"Улюблені",tabMe:"Я",
+ hostNext:"Наступна пісня",close:"Закрити",guest:"Гість",singer:"Співає",
+ nSongs:n=>n+" "+plural(n,"пісня","пісні","пісень"),tonSub:n=>n+" "+plural(n,"пісня","пісні","пісень"),
+ noRes:"Нічого не знайшлося",noResS:"Перевір написання або введи перші літери.",
+ noTon:"Поки порожньо",noTonS:"Натисни + біля будь-якої пісні, щоб додати її на сьогодні.",
+ noFav:"Улюблених поки немає",noFavS:"Натисни на сердечко біля пісні, і вона чекатиме тебе тут.",
+ noSung:"Історія почнеться сьогодні",noSungS:"Коли заспіваєш, натисни галочку у вкладці «Сьогодні».",
+ added:"Додано на сьогодні",already:"Уже в списку на сьогодні",removed:"Прибрано",faved:"Додано до улюблених",
+ unfaved:"Прибрано з улюблених",sang:"Браво! Збережено в історії",sungMeta:(n,d)=>"Заспівано "+n+"× · "+d,
+ loading:"Завантажуємо каталог…",loadErr:"Каталог не завантажився. Перевір інтернет і онови сторінку.",cLat:"Латиниця",bk:"бек",bkAlso:n=>"З бек-вокалом: № "+n,
+ aFav:"До улюблених",aAdd:"Додати на сьогодні",aDone:"Заспівано",aUp:"Вище",aDown:"Нижче",aRem:"Прибрати",hi:n=>"Привіт, "+n+"!"}
+};
+function plural(n,a,b,c){const m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<12||h>14)?b:c}
+const t=k=>T[S.ui][k];
+
+/* ---------- HELPERS ---------- */
+const $=id=>document.getElementById(id);
+const ICON={fav:"M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z",add:"M12 5v14M5 12h14",
+ done:"M5 12.5l4.5 4.5L19 7.5",rem:"M6 6l12 12M18 6L6 18",up:"M6 14l6-6 6 6",down:"M6 10l6 6 6-6"};
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function ib(kind,label,on,fn,extra){
+  const b=el("button","ib "+kind+(on?" on":"")+(extra?" "+extra:""));b.type="button";b.setAttribute("aria-label",label);b.title=label;
+  const key=kind.split(" ")[0];
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+ICON[key]+'"/></svg>';
+  if(kind.startsWith("fav")||kind.startsWith("add"))b.setAttribute("aria-pressed",on?"true":"false");
+  b.onclick=()=>{b.classList.add("pop");fn()};return b}
+let toastT;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove("show"),1600)}
+function empty(a,b){const d=el("li","empty");d.append(el("b",null,a),document.createTextNode(b));return d}
+
+/* ---------- ACTIONS ---------- */
+function toggleFav(id){const i=S.favs.indexOf(id);if(i<0){S.favs.unshift(id);toast(t("faved"))}else{S.favs.splice(i,1);toast(t("unfaved"))}save();render()}
+function toggleQueue(id){const i=S.queue.indexOf(id);if(i<0){S.queue.push(id);toast(t("added"))}else{S.queue.splice(i,1);toast(t("removed"))}save();render()}
+function move(i,d){const j=i+d;if(j<0||j>=S.queue.length)return;[S.queue[i],S.queue[j]]=[S.queue[j],S.queue[i]];save();render()}
+function sang(id){S.queue=S.queue.filter(x=>x!==id);const r=S.sung[id]||{n:0};S.sung[id]={n:r.n+1,last:Date.now()};save();toast(t("sang"));render()}
+function forget(id){delete S.sung[id];save();render()}
+
+/* ---------- ROWS ---------- */
+function row(s,o={}){
+  const li=el("li","song");
+  if(o.num)li.append(el("span","num",o.num));
+  const x=el("div","txt");x.append(el("div","t",s.title),el("div","a",s.artist));
+  if(s.no&&s.bk)x.append(el("div","bk",t("bkAlso")(s.bk)));
+  if(o.meta)x.append(el("div","meta",o.meta));
+  const n=el("span","no","№ "+(s.no||s.bk));if(!s.no)n.append(el("i",null,t("bk")));
+  li.append(x,n);
+  const a=el("div","acts");
+  if(o.queue){
+    a.append(ib("up",t("aUp"),0,()=>move(o.i,-1),"sm"),ib("down",t("aDown"),0,()=>move(o.i,1),"sm"),
+             ib("done",t("aDone"),0,()=>sang(s.id),"sm"),ib("rem",t("aRem"),0,()=>toggleQueue(s.id),"sm"));
+    a.children[0].disabled=o.i===0;a.children[1].disabled=o.i===S.queue.length-1;
+  }else{
+    a.append(ib("fav",t("aFav"),S.favs.includes(s.id),()=>toggleFav(s.id)),
+             ib("add",t("aAdd"),S.queue.includes(s.id),()=>toggleQueue(s.id)));
+    if(o.forget)a.append(ib("rem",t("aRem"),0,()=>forget(s.id)));
+  }
+  li.append(a);return li}
+
+/* ---------- RENDER ---------- */
+function renderSongs(){
+  const ul=$("results");
+  if(!LOADED){$("count").textContent="";$("more").hidden=true;ul.replaceChildren(el("li","empty",t(LOAD_ERR?"loadErr":"loading")));return}
+  const qt=words($("q-title").value), qa=words($("q-artist").value);
+  const res=[];let total=0;
+  for(const s of SONGS){
+    if(view.lang!=="all"&&s.lang!==view.lang)continue;
+    if(!hit(s.tn,s.tl,qt)||!hit(s.an,s.al,qa))continue;
+    if(total++<view.limit)res.push(s);
+  }
+  $("count").textContent=t("nSongs")(total).replace(String(total),total.toLocaleString(S.ui));
+  ul.replaceChildren(...(res.length?res.map(s=>row(s,{meta:S.sung[s.id]?sungMeta(s.id):null})):[empty(t("noRes"),t("noResS"))]));
+  $("more").hidden=total<=view.limit;
+}
+const sungMeta=id=>t("sungMeta")(S.sung[id].n,new Date(S.sung[id].last).toLocaleDateString(S.ui,{day:"numeric",month:"short"}));
+function renderTonight(){
+  const q=S.queue.map(id=>BY_ID.get(id)).filter(Boolean);
+  $("ton-sub").textContent=t("tonSub")(q.length);
+  $("ton-bar").hidden=!q.length;
+  $("queue").replaceChildren(...(q.length?q.map((s,i)=>row(s,{queue:1,i,num:i+1})):[empty(t("noTon"),t("noTonS"))]));
+}
+function renderFavs(){
+  const f=S.favs.map(id=>BY_ID.get(id)).filter(Boolean);
+  $("fav-bar").hidden=f.length<2;
+  $("favs").replaceChildren(...(f.length?f.map(s=>row(s,{meta:S.sung[s.id]?sungMeta(s.id):null})):[empty(t("noFav"),t("noFavS"))]));
+}
+function renderMe(){
+  const name=S.name||t("guest");
+  $("me-name").textContent=name;$("ava").textContent=name.trim().charAt(0).toUpperCase()||"?";
+  const ids=Object.keys(S.sung).filter(id=>BY_ID.has(id)).sort((a,b)=>S.sung[b].last-S.sung[a].last);
+  $("s-fav").textContent=S.favs.length;$("s-sung").textContent=ids.length;
+  $("s-times").textContent=ids.reduce((a,id)=>a+S.sung[id].n,0);
+  $("sung").replaceChildren(...(ids.length?ids.map(id=>row(BY_ID.get(id),{meta:sungMeta(id),forget:1})):[empty(t("noSung"),t("noSungS"))]));
+}
+function applyText(){
+  document.documentElement.lang=S.ui;
+  document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+  document.querySelectorAll("[data-i18n-ph]").forEach(e=>e.placeholder=t(e.dataset.i18nPh));
+  document.querySelectorAll("[data-ui]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.ui===S.ui));
+}
+function render(){
+  $("hello").hidden=!!S.name;
+  const b=$("b-ton");b.hidden=!S.queue.length;b.textContent=S.queue.length;
+  renderSongs();renderTonight();renderFavs();renderMe();
+}
+
+/* ---------- TABS ---------- */
+const TABS=["songs","tonight","favorites","me"];
+function show(){
+  const tab=TABS.includes(location.hash.slice(1))?location.hash.slice(1):"songs";
+  TABS.forEach(n=>{$("v-"+n).hidden=n!==tab});
+  document.querySelectorAll("nav button").forEach(b=>b.dataset.tab===tab?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  $("main").scrollTop=0;
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab;show()});
+addEventListener("hashchange",show);
+
+/* ---------- EVENTS ---------- */
+let deb;const onSearch=()=>{clearTimeout(deb);deb=setTimeout(()=>{view.limit=40;renderSongs()},120)};
+$("q-title").oninput=onSearch;$("q-artist").oninput=onSearch;
+document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{view.lang=b.dataset.lang;view.limit=40;
+  document.querySelectorAll("[data-lang]").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSongs()});
+$("more").onclick=()=>{view.limit+=40;renderSongs()};
+$("hello").onsubmit=e=>{e.preventDefault();const n=$("name-in").value.trim();if(!n){$("name-in").focus();return}
+  S.name=n;save();render();toast(t("hi")(n))};
+$("rename").onclick=()=>{$("rename-form").hidden=false;$("rename-in").value=S.name;$("rename-in").focus()};
+$("rename-form").onsubmit=e=>{e.preventDefault();S.name=$("rename-in").value.trim();save();$("rename-form").hidden=true;render()};
+document.querySelectorAll("[data-ui]").forEach(b=>b.onclick=()=>{S.ui=b.dataset.ui;save();applyText();render()});
+$("surprise").onclick=()=>{const pool=S.favs.filter(id=>BY_ID.has(id)&&!S.queue.includes(id));
+  if(!pool.length){toast(t("already"));return}
+  const id=pool[Math.floor(Math.random()*pool.length)];S.queue.push(id);save();render();toast(BY_ID.get(id).title+" · "+t("added"))};
+$("show-host").onclick=()=>{const s=BY_ID.get(S.queue[0]);if(!s)return;
+  $("h-n").textContent="№ "+(s.no||s.bk);$("h-t").textContent=s.title;$("h-a").textContent=s.artist;$("h-s").textContent=t("singer")+": "+(S.name||t("guest"));$("host").hidden=false};
+$("host-close").onclick=()=>{$("host").hidden=true};
+
+applyText();render();show();loadCatalog();
+</script>
+</body>
+</html>
